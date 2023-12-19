@@ -30,6 +30,10 @@
                 </svg>
             </div>
         </div>
+        <audio autoplay loop>
+            <source src="./圣诞.mp3" type="audio/mp3">
+            Your browser does not support the audio tag.
+        </audio>
     </div>
 </body>
 </html>
@@ -59,6 +63,13 @@
             }
         },
         mounted() {
+            // 播放音乐
+            var audio = new Audio('./圣诞.mp3');
+            audio.loop = true;
+            document.addEventListener('click', function() {
+                audio.play();
+            });
+
             let _this = this
             let starArr = _this.$refs.star
             starArr.forEach(item =>{
