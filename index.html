@@ -12,16 +12,23 @@
 </head>
 <body>
     <div id="app">
+        <div class="word-container">
+            <p v-for="(line, lineIndex) in lines" :key="lineIndex" class="word">
+                <span v-for="(char, charIndex) in line" :key="charIndex">{{ char }}</span>
+            </p>
+        </div>
         <div class="stars">
             <div v-for="(item,index) in statrsCount" :key="index" ref="star" class="star"></div>
         </div>
-        <div class="tree">
-            <!-- --开头的属性是CSS的自定义属性，可通过var函数对其调用 -->
-            <div class="tree-light" v-for="(item,index) in 50" :style="{'--appear':index,'--y':2*index,'--rotate':1440-28.8*index,'--radius':12.5-0.25*index,'--speed':index*0.1,'--delay':index*0.05}"></div>
-            <!-- 星星 -->
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 113.32 108.44" class="tree-star" style="--delay:50;">
-                <path d="M90.19 104.33L57.12 87.38 24.4 105l5.91-36.69L3.44 42.65l36.72-5.72 16.1-33.5L73.06 36.6l36.83 4.97-26.35 26.21z" fill="none" stroke-width="6.88" stroke-linecap="round" stroke-linejoin="round"></path>
-            </svg>
+        <div class="tree-containr">
+            <div class="tree">
+                <!-- --开头的属性是CSS的自定义属性，可通过var函数对其调用 -->
+                <div class="tree-light" v-for="(item,index) in 50" :style="{'--appear':index,'--y':2*index,'--rotate':1440-28.8*index,'--radius':12.5-0.25*index,'--speed':index*0.1,'--delay':index*0.05}"></div>
+                <!-- 星星 -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 113.32 108.44" class="tree-star" style="--delay:50;">
+                    <path d="M90.19 104.33L57.12 87.38 24.4 105l5.91-36.69L3.44 42.65l36.72-5.72 16.1-33.5L73.06 36.6l36.83 4.97-26.35 26.21z" fill="none" stroke-width="6.88" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+            </div>
         </div>
     </div>
 </body>
@@ -34,20 +41,58 @@
         data:{
             statrsCount: 1800,//星星数量
             distance: 1000,//间距
+            linesToType: [// 展示的文字
+                'To 佳慧：\n',
+                '今天是2024年12月24日，平安夜，鄙人不才想送你一个小礼物。\n',
+                '愿你的圣诞充满欢笑和温馨，就像我们之间的每一个交流一样，轻松自在。\n',
+                '愿我们的未来像圣诞树上的彩灯一样灿烂夺目。\n',
+                '期待着未来我们一同度过更多美好的时光，分享更多欢笑和故事。\n',
+                'By 宇航'
+            ],
+            linesTyped: [],
+            currentLineIndex: 0,
+            currentCharIndex: 0
+        },
+        computed: {
+            lines() {
+                return this.linesTyped.join('').split('\n');
+            }
         },
         mounted() {
-            this.$nextTick(() => {
-                let _this = this
-                console.log(this.$refs.star);
-                let starArr = _this.$refs.star
-                starArr.forEach(item =>{
-                    var speed = 0.2 + (Math.random() * 1);
-                    var thisDistance = _this.distance + (Math.random() * 300);
-                    item.style.transformOrigin = `0 0 ${thisDistance}px`;
-                    item.style.transform=`translate3d(0,0,-${thisDistance}px)
-                    rotateY(${(Math.random() * 360)}deg) rotateX(${(Math.random() * -50)}deg) scale(${speed},${speed})`
-                })
+            let _this = this
+            let starArr = _this.$refs.star
+            starArr.forEach(item =>{
+                var speed = 0.2 + (Math.random() * 1);
+                var thisDistance = _this.distance + (Math.random() * 300);
+                item.style.transformOrigin = `0 0 ${thisDistance}px`;
+                item.style.transform=`translate3d(0,0,-${thisDistance}px)
+                rotateY(${(Math.random() * 360)}deg) rotateX(${(Math.random() * -50)}deg) scale(${speed},${speed})`
             })
+            this.startTyping();
+        },
+        methods: {
+            startTyping() {
+                const typingInterval = setInterval(() => {
+                    const currentLine = this.linesToType[this.currentLineIndex];
+                    const currentChar = currentLine[this.currentCharIndex];
+                    
+                    if (currentChar !== undefined) {
+                      // Add the current character to the typed line
+                      this.linesTyped.push(currentChar);
+                      this.currentCharIndex++;
+                    } else {
+                      // Move to the next line when the current line is complete
+                      this.currentLineIndex++;
+                      this.currentCharIndex = 0;
+                      this.linesTyped.push(""); // Add an empty string for line break
+
+                      // Stop the typing effect when all lines are displayed
+                      if (this.currentLineIndex === this.linesToType.length) {
+                        clearInterval(typingInterval);
+                      }
+                    }
+                }, 300); // Adjust the interval as needed
+            }
         }
     })
 </script>
@@ -55,12 +100,27 @@
 <style>
 #app {
     /* 100%窗口宽高 */
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    overflow: hidden;
+}
+.tree-containr {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.word-container {
+    width: 400px;
+    padding: 16px;
+}
+.word {
+    width: 100%;
+    color: #fff;
+    font-size: 16px;
+    font-style: italic;
+    font-weight: bold;
 }
 /* 星空背景CSS */
 @keyframes starMove {
