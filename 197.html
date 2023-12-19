@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>彩带圣诞树</title>
+    <link rel="stylesheet" href="197.css">
+    <!-- 引入vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <!-- <script src="/js/vue.min.js"></script> -->
+</head>
+<body>
+    <div id="app">
+        <div class="stars">
+            <div v-for="(item,index) in statrsCount" :key="index" ref="star" class="star"></div>
+        </div>
+        <div class="tree">
+            <!-- --开头的属性是CSS的自定义属性，可通过var函数对其调用 -->
+            <div class="tree-light" v-for="(item,index) in 50" :style="{'--appear':index,'--y':2*index,'--rotate':1440-28.8*index,'--radius':12.5-0.25*index,'--speed':index*0.1,'--delay':index*0.05}"></div>
+            <!-- 星星 -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 113.32 108.44" class="tree-star" style="--delay:50;">
+                <path d="M90.19 104.33L57.12 87.38 24.4 105l5.91-36.69L3.44 42.65l36.72-5.72 16.1-33.5L73.06 36.6l36.83 4.97-26.35 26.21z" fill="none" stroke-width="6.88" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    // 这里是vue的语法
+    new Vue({
+        el:'#app',
+        data:{
+            statrsCount: 1800,//星星数量
+            distance: 1000,//间距
+        },
+        mounted() {
+            this.$nextTick(() => {
+                let _this = this
+                console.log(this.$refs.star);
+                let starArr = _this.$refs.star
+                starArr.forEach(item =>{
+                    var speed = 0.2 + (Math.random() * 1);
+                    var thisDistance = _this.distance + (Math.random() * 300);
+                    item.style.transformOrigin = `0 0 ${thisDistance}px`;
+                    item.style.transform=`translate3d(0,0,-${thisDistance}px)
+                    rotateY(${(Math.random() * 360)}deg) rotateX(${(Math.random() * -50)}deg) scale(${speed},${speed})`
+                })
+            })
+        }
+    })
+</script>
+
+<style>
+#app {
+    /* 100%窗口宽高 */
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/* 星空背景CSS */
+@keyframes starMove {
+    0%{
+        transform: perspective(400px) rotateZ(20deg) rotateX(-40deg) rotateY(0);
+    }
+    100%{
+        transform: perspective(400px) rotateZ(20deg) rotateX(-40deg) rotateY(-360deg);
+    }
+}
+.stars{
+    transform: perspective(100px);
+    transform-style: preserve-3d;
+    position: absolute;
+    perspective-origin: 50% 100%;
+    left:50%;
+    animation: starMove 90s infinite linear ;
+    bottom: 0;
+}
+.star{
+    width: 2px;
+    height: 2px;
+    background: #f7f7b8;
+    position: absolute;
+    top: 0;
+    left: 0;
+    backface-visibility: hidden;
+}
+</style>
